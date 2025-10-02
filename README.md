@@ -61,7 +61,7 @@ exiba uma mensagem de confirmação (ex.: "Transferência de € 100,00 para a
 conta 12345 realizada com sucesso").
 - Caso contrário, exiba erro de saldo insuficiente.
 8. Consultar Movimentos:
-- Exiba uma lista dos úl􀆟mos 10 movimentos (ou todos se houver menos),
+- Exiba uma lista dos últimos 10 movimentos (ou todos se houver menos),
 formatados de forma legível (ex.: "2025-10-01 14:30 - Depósito: € 200,00").
 - Inclua Tipo, valor, data/hora e descrição.
 - Se não houver movimentos, exiba "Nenhum movimento registado."
