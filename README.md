@@ -41,7 +41,7 @@ Leia a opção do utilizador e chame a função correspondente.
 - Exiba o saldo atual da conta formatado como moeda (ex.: "Saldo atual: €
 1.000,00").
 5. Realizar Levantamento:
-- Peça o valor a levantar (deve ser um número posi􀆟vo).
+- Peça o valor a levantar (deve ser um número positivo).
 - Verifique se o valor é menor ou igual ao saldo disponível.
 - Se sim, subtraia do saldo, registe o movimento na lista de histórico e confirme
 a operação; caso contrário, exiba uma mensagem de erro (ex.: "Saldo
