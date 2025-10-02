@@ -6,17 +6,18 @@ class multibanco:
     def __init__(self):
        
         self.acesso = {
-                "1234": {"nome": "João Silva", "saldo": 1000.0, "movimentos": []},
-                "5678": {"nome": "Maria Santos", "saldo": 1000.0, "movimentos": []},
-                "0000": {"nome": "Admin Sistema", "saldo": 1000.0, "movimentos": []},
-                "9999": {"nome": "Usuário Teste", "saldo": 1000.0, "movimentos": []},
-                "1111": {"nome": "Carlos Oliveira", "saldo": 1000.0, "movimentos": []},
-                "2222": {"nome": "Ana Costa", "saldo": 1000.0, "movimentos": []}
+            "1001": {"nome": "João Silva", "pin": "1234", "saldo": 1000.0, "movimentos": []},
+            "1002": {"nome": "Maria Santos", "pin": "5678", "saldo": 1000.0, "movimentos": []},
+            "1003": {"nome": "Admin Sistema", "pin": "0000", "saldo": 1000.0, "movimentos": []},
+            "1004": {"nome": "Usuário Teste", "pin": "9999", "saldo": 1000.0, "movimentos": []},
+            "1005": {"nome": "Carlos Oliveira", "pin": "1111", "saldo": 1000.0, "movimentos": []},
+            "1006": {"nome": "Ana Costa", "pin": "2222", "saldo": 1000.0, "movimentos": []}
             }
         self.usuario_logado = None
 
     def limpar_tela(self):
         os.system("cls" if os.name == "nt" else "clear")
+    
       
     def logar(self):
         self.limpar_tela()
@@ -26,14 +27,17 @@ class multibanco:
 
         tentativas = 0
         while tentativas < 3:
-            pin = getpass.getpass("Digite seu PIN")
 
-            if pin in self.acesso:
-                self.usuario_logado = pin
-                nome = self.acesso[pin]["nome"]
-                print(f"Bem-vindo, {nome}")
+            numero_conta=input("Digite o nº da sua conta: ")
+            pin = getpass.getpass("Digite seu PIN: ")
+
+            if numero_conta in self.acesso and self.acesso[numero_conta]["pin"] == pin:
+
+                self.usuario_logado = numero_conta
+                conta_encontrada = self.acesso[numero_conta]
+                print(f"Bem-vindo, {conta_encontrada['nome']}")
                 input("Pressione Enter para continuar")
-                return nome
+                return conta_encontrada
             else:
                 print("PIN incorreto")
                 tentativas += 1
@@ -43,12 +47,80 @@ class multibanco:
 
     def consultar_saldo(self):
         self.limpar_tela()
-        pin = self.usuario_logado
-        saldo = self.acesso[pin]["saldo"]
-        print(f"Saldo atual: {saldo:.2f} €")
+        numero_conta = self.usuario_logado
+        saldo = self.acesso[numero_conta]["saldo"]
+        print("=" *20)
+        print(" SALDO ")
+        print("=" *20)
+        print(f"Saldo atual: € {saldo:.2f} ")
         input("Pressione Enter para continuar")
+        self.limpar_tela()
         return saldo
-      
+     
+    def realizar_levantamento(self):
+        self.limpar_tela()
+        numero_conta = self.usuario_logado
+        saldo = self.acesso[numero_conta]["saldo"]
+        print("=" *20)
+        print(" LEVANTAMENTO ")
+        print("=" *20)
+        print(f"Saldo atual: € {saldo:.2f} ")
+        valor = float(input("Digite o valor a levantar: € "))
+        if valor > saldo:
+            print("Saldo insuficiente")
+            input("Pressione Enter para continuar")
+            return
+        self.acesso[numero_conta]["saldo"] -= valor
+        print(f"Levantamento de € {valor:.2f}  realizado com sucesso")
+        input("Pressione Enter para continuar")
+        self.limpar_tela()
+        self.consultar_saldo()  
+        return
+
+    def realizar_deposito(self):
+        self.limpar_tela()
+        numero_conta = self.usuario_logado
+        print("=" *20)
+        print(" DEPÓSITO ")
+        print("=" *20)
+        valor = float(input("Digite o valor a depositar: € "))
+        self.acesso[numero_conta]["saldo"] += valor
+        print(f"Depósito de € {valor:.2f}  realizado com sucesso")
+        input("Pressione Enter para continuar")
+        self.limpar_tela()
+        self.consultar_saldo()
+        return
+
+    def realizar_transferencia(self):
+        self.limpar_tela()
+        numero_conta = self.usuario_logado
+        saldo = self.acesso[numero_conta]["saldo"]
+        print(f"Saldo atual: € {saldo:.2f} ")
+        print("Digite os dados para transferência.")
+
+        try:
+            conta_destino = input("Conta de destino: ")
+            valor = float(input("Valor a transferir: € "))
+
+            if conta_destino not in self.acesso:
+                print("Conta não encontrada!")
+            elif conta_destino == numero_conta:
+                print("Não pode transferir para a própria conta!")
+            elif valor <= 0:
+                print("Valor deve ser positivo e válido!")
+            elif valor > saldo:
+                print("Saldo insuficiente!")
+            else:
+                self.acesso[numero_conta]['saldo'] -= valor
+                self.acesso[conta_destino]['saldo'] += valor
+                print(f"Transferência de € {valor:.2f} realizada com sucesso!")
+                print(f"Novo saldo: € {self.acesso[numero_conta]['saldo']:.2f}")
+        
+        except ValueError:
+            print(" Valor inválido!")
+    
+        input("\nPressione Enter para voltar ao menu...")
+       
 
     def menu(self):
         self.limpar_tela()
