@@ -1,6 +1,7 @@
 import getpass
 import datetime
 import os
+import  sys
 
 class multibanco:
     def __init__(self):
@@ -18,25 +19,54 @@ class multibanco:
     def limpar_tela(self):
         os.system("cls" if os.name == "nt" else "clear")
     
-      
+    def submenu(self):
+        print("=" *40)
+        while True:
+            try:
+                escolha = input("Deseja realizar outra operação? (s/n): ").strip().lower()
+                if escolha in ("s", "sim"):
+                    return   
+                elif escolha in ("n", "nao", "não"):
+                    print("Saindo do programa...")
+                    sys.exit(0)
+                else:
+                    print("Opção inválida. Responda com 's' ou 'n'.")
+            except (KeyboardInterrupt, EOFError):
+                print("\nInterrupção detectada. Saindo com segurança...")
+                sys.exit(0)
+            except Exception as e:
+                print(f"Ocorreu um erro inesperado: {e}")
+  
     def logar(self):
         self.limpar_tela()
-        print("*" *40)
-        print("Bem-vindo ao Multibanco")
-        print("*" *40)
-
+        print("=" *40)
+        print("TERMINAL MULTIBANCO".center(40))
+        print("=" *40)
+        print("Bem-vindo!".center(40))
+        print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S\n".center(40)))
+        print("-" *40)
+        print("Por favor, insira seus dados para".center(40))
+        print("continuar.".center(40))
+        print("-" *40)
         tentativas = 0
         while tentativas < 3:
 
-            numero_conta=input("Digite o nº da sua conta: ")
-            pin = getpass.getpass("Digite seu PIN: ")
+            numero_conta=input("Nº da sua conta: ")
+            pin = getpass.getpass("PIN de Acesso: ")
 
             if numero_conta in self.acesso and self.acesso[numero_conta]["pin"] == pin:
 
                 self.usuario_logado = numero_conta
                 conta_encontrada = self.acesso[numero_conta]
-                print(f"Bem-vindo, {conta_encontrada['nome']}")
-                input("Pressione Enter para continuar")
+                self.limpar_tela()
+                print("=" *45)
+                print("TERMINAL MULTIBANCO".center(45))
+                print("=" *45)
+                print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S\n".center(45)))
+                print(f"\nOlá {conta_encontrada['nome']}, seja Bem-vindo!\n".center(50))
+                print("-" *45)
+                input("Pressione Enter e Escolha a opção desejada.")
+                
                 return conta_encontrada
             else:
                 print("PIN incorreto")
@@ -49,86 +79,110 @@ class multibanco:
         self.limpar_tela()
         numero_conta = self.usuario_logado
         saldo = self.acesso[numero_conta]["saldo"]
-        print("=" *20)
-        print(" SALDO ")
-        print("=" *20)
-        print(f"Saldo atual: € {saldo:.2f} ")
-        input("Pressione Enter para continuar")
+        print("=" *40)
+        print("SALDO".center(40))
+        print("=" *40)
+        print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S\n".center(20)))
+        print(f"\nSaldo atual:" + f"€{saldo:.2f}".rjust(25))
+        self.submenu()
         self.limpar_tela()
-        return saldo
-     
+        
+ 
     def realizar_levantamento(self):
-        self.limpar_tela()
-        numero_conta = self.usuario_logado
-        saldo = self.acesso[numero_conta]["saldo"]
-        print("=" *20)
-        print(" LEVANTAMENTO ")
-        print("=" *20)
-        print(f"Saldo atual: € {saldo:.2f} ")
-        try:
-            valor = float(input("Digite o valor a levantar: € "))
-            if valor > saldo:
-                print("Saldo insuficiente")
-                input("Pressione Enter para continuar")
-            else:
-                self.acesso[numero_conta]["saldo"] -= valor
-                movimento ={
-                    "tipo" : "Levantamento",
-                    "valor" : -valor,
-                    "data" : datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "descricao" : "Levantamento em multibanco"
-                }
-                self.acesso[numero_conta]["movimentos"].append[movimento]
-                print(f"Levantamento de € {valor:.2f}  realizado com sucesso")
+        while True:
+            self.limpar_tela()
+            numero_conta = self.usuario_logado
+            saldo = self.acesso[numero_conta]["saldo"]
+            print("=" *40)
+            print("LEVANTAMENTO".center(40))
+            print("=" *40)
+            print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S\n".center(20)))
+            print(f"\nSaldo atual:" + f"€{saldo:.2f}".rjust(25))
+            print("=" *40)
+            try:
+                valor = float(input("Informe o valor a levantar (€): "))
+                print("-" *40)
+                if valor <=10:
+                    print("\nLimite mínimo de levantamento é de € 10,00")
+                    input("Pressione Enter e Escolha outro valor.")
+                    continue
+                elif valor > saldo:
+                    print("\nSaldo Insuficiente")
+                    input("Pressione Enter e Escolha outro valor.")
+                    continue
+                else:
+                    self.acesso[numero_conta]["saldo"] -= valor
+                    movimento ={
+                        "tipo" : "Levantamento",
+                        "valor" : -valor,
+                        "data" : datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "descricao" : "Levantamento em multibanco"
+                    }
+                    self.acesso[numero_conta]["movimentos"].append(movimento)
+                    print(f"\nLevantamento de € {valor:.2f} Autorizado!")
+                    print(f"Saldo Atual:" + f" € {self.acesso[numero_conta]['saldo']:.2f}".rjust(25))
+                    print("=" *40)
+                    input("\nRetire o seu dinheiro...")
+                    self.limpar_tela()  
+                    return
+                                  
 
-        except ValueError:
-            print["Valor inválido!"]
-
-        input("Pressione Enter para continuar")
-        self.limpar_tela()
-        self.consultar_saldo()  
-        return
+            except ValueError:
+                print["\nValor inválido!"]
+                input("Pressione Enter para voltar ao menu...")
+            
+            return
 
     def realizar_deposito(self):
-        self.limpar_tela()
+        while True:
+            self.limpar_tela()
 
-        numero_conta = self.usuario_logado
-        print("=" *20)
-        print(" DEPÓSITO ")
-        print("=" *20)
+            numero_conta = self.usuario_logado
+            print("=" *40)
+            print("DEPÓSITO".center(40))
+            print("=" *40)
+            print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S\n".center(20)))
+            print(f"Saldo Atual:" + f" € {self.acesso[numero_conta]['saldo']:.2f}".rjust(25))
+            print("=" *40)
 
-        try:
-            valor = float(input("Digite o valor a depositar: € "))
-            if valor<=0:
-                print["Valor deve ser positivo!"]
-            else:
-                self.acesso[numero_conta]["saldo"] -= valor
-                movimento ={
-                    "tipo" : "Depósito",
-                    "valor" : valor,
-                    "data" : datetime.now().strftime("%Y-%m-%d %H:%M"),
-                    "descricao" : "Depósito em multibanco"
-                }
-                self.acesso[numero_conta]["movimentos"].append[movimento]
-                print(f"Depósito de € {valor:.2f}  realizado com sucesso")
-
-        except ValueError:
-            print["Valor inválido!"]
-
-        input("Pressione Enter para continuar")
-        self.limpar_tela()
-        self.consultar_saldo()  
-        return
+            try:
+                valor = float(input("Digite o valor a depositar: € "))
+                print("-" *40)
+                if valor<=0:
+                    print["Valor deve ser positivo!"]
+                    input("Pressione Enter e Escolha outro valor.")
+                    continue
+                else:
+                    self.acesso[numero_conta]["saldo"] += valor
+                    movimento ={
+                        "tipo" : "Depósito",
+                        "valor" : +valor,
+                        "data" : datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "descricao" : "Depósito em multibanco"
+                    }
+                    self.acesso[numero_conta]["movimentos"].append(movimento)
+                    print(f"Depósito realizado com sucesso.")
+                    print(f"Saldo Atual:" + f" € {self.acesso[numero_conta]['saldo']:.2f}".rjust(25))
+                    print("=" *40)
+                    self.submenu()
+                    self.limpar_tela()  
+            except ValueError:
+                print["\nValor inválido!"]
+                input("\nPressione Enter para voltar ao menu...")
+            return
 
     def realizar_transferencia(self):
         self.limpar_tela()
 
         numero_conta = self.usuario_logado
         saldo = self.acesso[numero_conta]["saldo"]
-        print("=" *20)
-        print(" TRANSFERÊNCIA ")
-        print("=" *20)
-        print(f"Saldo atual: € {saldo:.2f} ")
+        print("=" *40)
+        print("TRANSFERÊNCIA".center(40))
+        print("=" *40)
+        print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S".center(40)))
+        print("-" *40)
+        print(f"Saldo Atual:" + f" € {self.acesso[numero_conta]['saldo']:.2f}".rjust(25))
+        print("=" *40)
         print("Digite os dados para transferência.")
 
         try:
@@ -150,20 +204,22 @@ class multibanco:
                 movimento_origem = {
                     "tipo": "Transferência",
                     "valor": -valor,
-                    "data": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "data": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                     "descricao": f"Transferência para conta {conta_destino}"
                 }
                 movimento_destino = {
                     "tipo": "Transferência",
                     "valor": valor,
-                    "data": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    "data": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                     "descricao": f"Transferência para conta {numero_conta}"
                 }
                 self.acesso[numero_conta]["movimentos"].append(movimento_origem)
                 self.acesso[conta_destino]["movimentos"].append(movimento_destino)
+                print("-" *40)
+                print(f"Transferência de € {valor:.2f} para conta {conta_destino}\nrealizada com sucesso!")
                 
-                print(f"Transferência de € {valor:.2f} realizada com sucesso!")
-                print(f"Novo saldo: € {self.acesso[numero_conta]['saldo']:.2f}")
+                print(f"Saldo Atual:" + f" € {self.acesso[numero_conta]['saldo']:.2f}".rjust(25))
+                print("=" *40)
         
         except ValueError:
             print(" Valor inválido!") 
@@ -173,18 +229,21 @@ class multibanco:
         self.limpar_tela()
         numero_conta = self.usuario_logado
         movimento = self.acesso[numero_conta]["movimentos"]
-        print("=" *20)
-        print(" HISTÓRICO MOVIMENTAÇÃO ")
-        print("=" *20)
+        print("=" *55)
+        print("HISTÓRICO DE MOVIMENTOS".center(55))
+        print("=" *55)
+        print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S".center(55)))
+        print("=" *55)
 
         if not movimento:
             print("Nenhum movimento registado.")
         else:
             ultimos_movimentos = movimento[-10:]
             for i, mov in enumerate(ultimos_movimentos,1):
-                print(f"{i} - {mov['data']} - {mov['tipo']}: € {mov['valor']: 2f}")
+                print(f"{i:<3} | {mov['data']:<16} | {mov['tipo']:<15} | € {mov['valor']:>5.2f}")
                 if mov['descricao']:
-                    print(f"    Drescrição: {mov['descricao']}")
+                    print(f"Descrição: {mov['descricao']}\n")
+                    print("=" *55)
         input("\nPressione Enter para voltar ao menu...")
         self.limpar_tela()
 
@@ -192,13 +251,18 @@ class multibanco:
     def menu(self):
         self.limpar_tela()
         while True:
-            print("\n=== MENU MULTIBANCO ===")
+            print("=" *30)
+            print("MENU MULTIBANCO".center(30))
+            print("=" *30)
+            print(datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S".center(30)))
+            print("-" *30)
             print("1 - Consultar Saldo")
             print("2 - Realizar Levantamento")
             print("3 - Realizar Depósito")
             print("4 - Realizar Transferência")
             print("5 - Consultar Movimentos")
             print("6 - Sair")
+            print("=" *30)
             opcao = input("Escolha uma opção: ").strip()
             match opcao:
                 case "1":
@@ -216,4 +280,3 @@ class multibanco:
                     break
                 case _:
                     print("Opção inválida")
-        
